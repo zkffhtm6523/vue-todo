@@ -1,39 +1,24 @@
 <template>
   <section>
-    <ul>
-      <li v-for="(todoItem, index) in todoItems" :key="todoItem" class="shadow">
+    <transition-group name="list" tag="ul">
+      <li v-for="(todoItem, index) in propsdata" :key="todoItem" class="shadow">
         <i class="checkBtn fas fa-check" aria-hidden="true"></i>
         {{ todoItem }}
         <span class="removeBtn" type="button" @click="removeTodo(todoItem, index)">
           <i class="far fa-trash-alt" aria-hidden="true"></i>
         </span>
       </li>
-    </ul>
+    </transition-group>
   </section>
 </template>
 
 <script>
 export default {
-  data(){
-    return {
-      todoItems: []
-    }
-  },
-  created(){
-    if(localStorage.length > 0){
-      for (var i = 0; i < localStorage.length; i++) {
-        if (localStorage.key(i) !== "loglevel:webpack-dev-server") {
-          this.todoItems.push(localStorage.key(i));
-        }
-      }
-    }
-    console.log(`todoItem : ${this.todoItems}`)
-  },
+  props: ['propsdata'],
   methods:{
     removeTodo(todoItem, index){
-      console.log(todoItem, index);
-      localStorage.removeItem(todoItem);
-      this.todoItems.splice(index, 1);
+      this.$emit('removeTodo', todoItem, index);
+      // $emit API : $emit('이벤트 이름), 하위 컴포넌트에서 이벤트 발생 -> 상위 컴포넌트로 신호 전
     }
   }
 }
@@ -41,6 +26,15 @@ export default {
 </script>
 
 <style scoped>
+  .list-enter-active, .list-leave-active{
+    transition: all 1s;
+  }
+
+  .list-enter, .list-leave-to{
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
   ul {
     list-style-type: none;
     padding-left: 0;
